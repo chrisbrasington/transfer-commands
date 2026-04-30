@@ -1,4 +1,3 @@
-````markdown
 # Transfer Commands
 
 This is a lightweight abstraction over `rsync` and SSH to reduce repetitive file transfer syntax and provide simple, memorable commands (`push`, `pull`) for working with a remote transfer directory.
@@ -52,6 +51,4 @@ pull
 * Remote target: `storage:/home/chris/transfer`
 * Supports wildcards and multiple files
 
-```
-```
 
