@@ -6,27 +6,30 @@ CONFIG_HOST="storage"
 REMOTE_DIR="./transfer"
 
 if [[ $# -eq 0 ]]; then
-    echo "Usage: ./push.sh <file|pattern> [more files...]"
+    echo "Usage: push <file|pattern> [more files...]"
     exit 1
 fi
 
-# Expand all args into a list of files (handles test*)
 FILES=()
 
 for arg in "$@"; do
-    # If wildcard expands, bash already handles it
-    # If it doesn't match, keep literal (we'll validate)
-    matches=( $arg )
+    # Expand tilde safely
+    eval "arg_expanded=\"$arg\""
 
-    if [[ ${#matches[@]} -eq 0 ]]; then
-        echo "No matches for: $arg"
-        exit 1
+    # If wildcard is used, expand it safely
+    if [[ "$arg_expanded" == *"*"* ]]; then
+        matches=( $arg_expanded )
+        if [[ ${#matches[@]} -eq 0 ]]; then
+            echo "No matches: $arg"
+            exit 1
+        fi
+        FILES+=("${matches[@]}")
+    else
+        FILES+=("$arg_expanded")
     fi
-
-    FILES+=("${matches[@]}")
 done
 
-# Validate files exist locally
+# Validate without breaking spaces
 for f in "${FILES[@]}"; do
     if [[ ! -f "$f" ]]; then
         echo "Error: not a file -> $f"
@@ -36,8 +39,6 @@ done
 
 echo "Pushing files:"
 printf ' - %s\n' "${FILES[@]}"
-echo
-echo "Target: ${CONFIG_HOST}:${REMOTE_DIR}/"
 echo
 
 rsync -avz --progress "${FILES[@]}" "${CONFIG_HOST}:${REMOTE_DIR}/"
