@@ -43,12 +43,23 @@ pull file*
 pull
 ```
 
+### Audiobook folder
+
+Pass `--audiobook` to target `storage:/home/chris/audiobook` instead of the default transfer folder:
+
+```bash
+push --audiobook book.m4b
+pull --audiobook book*
+pull --audiobook
+```
+
 ---
 
 ## Notes
 
 * Uses `rsync` over SSH
-* Remote target: `storage:/home/chris/transfer`
+* Default remote target: `storage:/home/chris/transfer`
+* `--audiobook` flag switches the remote target to `storage:/home/chris/audiobook`
 * Supports wildcards and multiple files
 
 
