@@ -6,6 +6,16 @@ HOST="storage"
 REMOTE_DIR="./transfer"
 LOCAL_DIR="."
 
+ARGS=()
+for arg in "$@"; do
+    if [[ "$arg" == "--audiobook" ]]; then
+        REMOTE_DIR="./audiobook"
+    else
+        ARGS+=("$arg")
+    fi
+done
+set -- "${ARGS[@]+"${ARGS[@]}"}"
+
 if [[ $# -eq 0 ]]; then
     echo "Remote files:"
     ssh "$HOST" "ls -1 $REMOTE_DIR"

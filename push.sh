@@ -6,13 +6,18 @@ CONFIG_HOST="storage"
 REMOTE_DIR="./transfer"
 
 if [[ $# -eq 0 ]]; then
-    echo "Usage: push <file|pattern> [more files...]"
+    echo "Usage: push [--audiobook] <file|pattern> [more files...]"
     exit 1
 fi
 
 FILES=()
 
 for arg in "$@"; do
+    if [[ "$arg" == "--audiobook" ]]; then
+        REMOTE_DIR="./audiobook"
+        continue
+    fi
+
     # Expand tilde safely
     eval "arg_expanded=\"$arg\""
 
