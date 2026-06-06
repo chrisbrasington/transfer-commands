@@ -41,6 +41,7 @@ Installs:
 
 * `pull` → download from server
 * `push` → upload to server
+* `commit` → stage, timestamp-commit, and push a git repo
 * config → `~/.config/transfer-commands/.env`
 
 At runtime the commands read `.env` from `$TRANSFER_COMMANDS_CONFIG` (default
@@ -81,6 +82,18 @@ pull --audiobook book*
 pull --audiobook
 ```
 
+### Quick commit
+
+`commit` stages everything, commits with a timestamp message, and pushes — no
+arguments:
+
+```bash
+commit
+```
+
+Run from inside any git repo and it acts on that repo. Run it from outside a
+git repo and it falls back to `~/obsidian`.
+
 ---
 
 ## Notes
@@ -89,5 +102,13 @@ pull --audiobook
 * Default remote target: `$TRANSFER_DIR` (default `./transfer`)
 * `--audiobook` flag switches the remote target to `$AUDIOBOOK_DIR` (default `./audiobook`)
 * Supports wildcards and multiple files
+* `commit` is independent of the SSH config — it only needs `git`. Commit
+  message is the current date/time (`YYYY-MM-DD HH:MM`). Outside a git repo it
+  uses `~/obsidian`.
+* `deploy.sh` installs `commit` to `/usr/local/bin/commit`. If a `commit`
+  already exists elsewhere on your `PATH` (for example an older
+  `/usr/bin/commit`), deploy **aborts** rather than installing a second copy
+  that could shadow it. Remove the old one (`sudo rm /usr/bin/commit`) and
+  re-run `./deploy.sh`.
 
 
