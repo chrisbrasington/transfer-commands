@@ -3,6 +3,17 @@
 set -euo pipefail
 
 INSTALL_DIR="/usr/local/bin"
+
+# Don't run the whole script as root. It calls sudo itself for the binary
+# install; running it with sudo makes $HOME resolve to root's home, so the
+# config lands in /root/.config instead of your own and `push`/`pull` can't
+# find it.
+if [[ $EUID -eq 0 ]]; then
+    echo "Don't run deploy.sh as root or with sudo." >&2
+    echo "Run it as your normal user: ./deploy.sh" >&2
+    echo "It will ask for sudo only when installing to $INSTALL_DIR." >&2
+    exit 1
+fi
 CONFIG_DIR="${TRANSFER_COMMANDS_CONFIG:-$HOME/.config/transfer-commands}"
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
