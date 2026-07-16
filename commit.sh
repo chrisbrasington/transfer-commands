@@ -1,14 +1,19 @@
 #!/bin/bash
 
-# Stage everything, commit with a timestamp message, and push.
-# In a git repo: operates on the current directory.
-# Outside a repo: falls back to ~/obsidian.
+# Ask for a commit message; fall back to the date if left empty
+read -r -p "Commit message (press Enter for date): " msg
+if [ -z "$msg" ]; then
+   msg="$(date +'%Y-%m-%d %H:%M')"
+fi
 
+# Check if the current directory is a git repository
 if git rev-parse --is-inside-work-tree &> /dev/null; then
-    echo "Using directory: $(pwd)"
-    git status && git add . && git commit -m "$(date +'%Y-%m-%d %H:%M')" && git push
+   # If in a git repo, print the current directory and run as usual
+   echo "Using directory: $(pwd)"
+   git status && git add . && git commit -m "$msg" && git push
 else
-    cd ~/obsidian || exit
-    echo "Using directory: $(pwd)"
-    git status && git add . && git commit -m "$(date +'%Y-%m-%d %H:%M')" && git push
+   # If not in a git repo, navigate to ~/obsidian and run the commands there
+   cd ~/obsidian || exit
+   echo "Using directory: $(pwd)"
+   git status && git add . && git commit -m "$msg" && git push
 fi

@@ -29,10 +29,12 @@ if [[ $# -eq 0 ]]; then
 fi
 
 FILES=()
+AUDIOBOOK=false
 
 for arg in "$@"; do
     if [[ "$arg" == "--audiobook" ]]; then
         REMOTE_DIR="${AUDIOBOOK_DIR:-./audiobook}"
+        AUDIOBOOK=true
         continue
     fi
 
@@ -65,3 +67,24 @@ printf ' - %s\n' "${FILES[@]}"
 echo
 
 rsync -avz --progress -e "ssh -p ${SSH_PORT}" "${FILES[@]}" "${SSH_USER}@${SSH_HOST}:${REMOTE_DIR}/"
+
+# For audiobooks, unzip each pushed archive in the remote audiobook dir and
+# remove the zip only if the unzip succeeds (the && chain guards the rm).
+if [[ "$AUDIOBOOK" == true ]]; then
+    echo
+    echo "Unzipping audiobooks in ${REMOTE_DIR} ..."
+    for f in "${FILES[@]}"; do
+        base="$(basename "$f")"
+        case "$base" in
+            *.zip|*.ZIP) ;;
+            *)
+                echo " - skipping non-zip: $base"
+                continue
+                ;;
+        esac
+
+        echo " - unzipping ${base}"
+        ssh -p "${SSH_PORT}" "${SSH_USER}@${SSH_HOST}" \
+            "cd $(printf '%q' "$REMOTE_DIR") && unzip -o $(printf '%q' "$base") && rm -f -- $(printf '%q' "$base")"
+    done
+fi
